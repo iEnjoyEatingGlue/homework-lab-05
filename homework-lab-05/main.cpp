@@ -10,7 +10,60 @@ public:
         setTexture(*texture);
 
     }
+    void setBounds(const float &top_,const float &bot_,const float &left_,const float &right_)
+    {
+        bound_top = top_;
+        bound_bottom = bot_;
+        bound_left = left_;
+        bound_right = right_;
+    }
+    void moveInDirection(const sf::Time &elapsed)
+    {
+        float time = elapsed.asSeconds();
+        sf::FloatRect guy = getGlobalBounds();
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        {
+            if(guy.top >= bound_top)
+            {
+                move(0,m_speed_y*time * -1.0);
+            }
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        {
+            if(guy.top + guy.height <= bound_bottom)
+            {
+                move(0,m_speed_y*time);
+            }
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            if(guy.left >= bound_left )
+            {
+                move(m_speed_x*time * -1.0,0);
+            }
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            if(guy.left + guy.width <= bound_right)
+            {
+                move(m_speed_x*time,0);
+            }
+        }
+    }
+    void setSpeed(const int &x,const int &y)
+    {
+        m_speed_x = x;
+        m_speed_y = y;
+    }
 private:
+    int m_speed_x = 0;
+    int m_speed_y = 0;
+
+    int bound_top = 0;
+    int bound_bottom = 0;
+    int bound_left = 0;
+    int bound_right = 0;
 
 };
 
@@ -23,32 +76,47 @@ public:
         setTexture(*texture);
         texture->setRepeated(true);
         setTextureRect(sf::IntRect(0, 0, window.getSize().x, window.getSize().y));
-
     }
 };
 
 class CustomWall: public sf::Sprite
 {
 public:
-    CustomWall(sf::Texture *texture,int top, int bottom, int width, int height)
-        : Top(top), Bottom(bottom), Width(width), Height(height)
+    CustomWall(sf::Texture *texture,int left, int Top, int width, int height)
+        : Left(left), Top(Top), Width(width), Height(height)
     {
         sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
         setTexture(*texture);
         texture->setRepeated(true);
         setTextureRect(sf::IntRect(0,0,Width,Height));
-        setPosition(Top,Bottom);
+        setPosition(Left,Top);
+    }
+    int WallLeft()
+    {
+        return Left;
+    }
+    int WallTop()
+    {
+        return Top;
+    }
+    int WallBottom()
+    {
+        return Top + Height;
+    }
+
+    int WallRight()
+    {
+        return Left + Width;
     }
 private:
+    int Left;
     int Top;
-    int Bottom;
     int Width;
     int Height;
 };
 
 int main()
 {
-
     sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
 
     sf::Clock clock;
@@ -76,9 +144,10 @@ int main()
     walls.emplace_back(wall_3);
     walls.emplace_back(wall_4);
 
+    guy.setSpeed(200,200);
+    guy.setBounds(0, window.getSize().y, 0, window.getSize().x);
     while (window.isOpen())
     {
-
         sf::Time elapsed = clock.restart();
         time_passed = time_passed + elapsed.asSeconds();
 
@@ -88,7 +157,7 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-        guy.move(0.001,0.001);
+        guy.moveInDirection(elapsed);
         window.clear(sf::Color::Black);
 
         window.draw(grass);
