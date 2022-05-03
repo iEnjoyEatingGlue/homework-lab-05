@@ -17,37 +17,54 @@ public:
         bound_left = left_;
         bound_right = right_;
     }
-    void moveInDirection(const sf::Time &elapsed)
+    void moveInDirection(const sf::Time &elapsed, bool colision)
     {
         float time = elapsed.asSeconds();
         sf::FloatRect guy = getGlobalBounds();
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
-            if(guy.top >= bound_top)
+            if(guy.top >= bound_top && colision == false)
             {
                 move(0,m_speed_y*time * -1.0);
+            }
+            else
+            {
+                move(0,1);
             }
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
-            if(guy.top + guy.height <= bound_bottom)
+            if(guy.top + guy.height <= bound_bottom && colision == false)
             {
                 move(0,m_speed_y*time);
+                move(0,-1*time);
+            }
+            else
+            {
+
             }
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
-            if(guy.left >= bound_left )
+            if(guy.left >= bound_left && colision == false)
             {
                 move(m_speed_x*time * -1.0,0);
+            }
+            else
+            {
+                move(1,0);
             }
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
-            if(guy.left + guy.width <= bound_right)
+            if(guy.left + guy.width <= bound_right && colision == false)
             {
                 move(m_speed_x*time,0);
+            }
+            else
+            {
+                move(-1,0);
             }
         }
     }
@@ -56,6 +73,7 @@ public:
         m_speed_x = x;
         m_speed_y = y;
     }
+
 private:
     int m_speed_x = 0;
     int m_speed_y = 0;
@@ -115,8 +133,27 @@ private:
     int Height;
 };
 
+bool ColisionCheck(const CustomGuy &guy, const std::vector<CustomWall> &walls)
+{
+    bool x = false;
+    sf::FloatRect guy_bounds = guy.getGlobalBounds();
+    for(auto &wall: walls)
+    {
+        sf::FloatRect wall_bounds = wall.getGlobalBounds();
+        if(guy_bounds.intersects(wall_bounds))
+        {
+        x = true;
+        return x;
+        break;
+        }
+
+    }
+    return x;
+}
+
 int main()
 {
+
     sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
 
     sf::Clock clock;
@@ -137,7 +174,7 @@ int main()
     CustomWall wall_1(&texture_wall, 100, 100, 250, 50);
     CustomWall wall_2(&texture_wall, 250, 150, 100, 400);
     CustomWall wall_3(&texture_wall, 250, 550, 250, 50);
-    CustomWall wall_4(&texture_wall, 450, 50, 50, 500);
+    CustomWall wall_4(&texture_wall, 450, 100, 50, 450);
 
     walls.emplace_back(wall_1);
     walls.emplace_back(wall_2);
@@ -157,7 +194,7 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-        guy.moveInDirection(elapsed);
+        guy.moveInDirection(elapsed,ColisionCheck(guy,walls));
         window.clear(sf::Color::Black);
 
         window.draw(grass);
