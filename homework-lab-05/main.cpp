@@ -144,7 +144,7 @@ std::vector<bool> Colisions(const CustomGuy &guy,std::vector<CustomWall> &walls)
         auto wall_left = wall.left - guy_.width;
         auto wall_right = wall.left + wall.width;
 
-        if(guy_top - 1 <= wall_top && guy_bottom + 1 >= wall_top && guy_left >= wall_left && guy_right <= wall_right)
+        if(guy_top - 1 <= wall_top && guy_bottom + 1 >= wall_top && guy_left >= wall_left && guy_right <= wall_right  + guy_.width)
         {
             v[1] = 0;
             break;
