@@ -142,9 +142,9 @@ std::vector<bool> Colisions(const CustomGuy &guy,std::vector<CustomWall> &walls)
         sf::FloatRect wall = wall_.getGlobalBounds();
         auto wall_top = wall.top;
         auto wall_left = wall.left - guy_.width;
-        auto wall_right = wall.left + wall.width;
+        auto wall_right = wall.left + wall.width + guy_.width;
 
-        if(guy_top - 1 <= wall_top && guy_bottom + 1 >= wall_top && guy_left >= wall_left && guy_right <= wall_right  + guy_.width)
+        if(guy_top - 1 <= wall_top && guy_bottom + 1 >= wall_top && guy_left >= wall_left && guy_right <= wall_right )
         {
             v[1] = 0;
             break;
@@ -157,7 +157,7 @@ std::vector<bool> Colisions(const CustomGuy &guy,std::vector<CustomWall> &walls)
         auto wall_bottom = wall.top + wall.height;
         auto wall_right = wall.left + wall.width;
 
-        if(guy_top <= wall_bottom && guy_bottom >= wall_top && guy_left - 1 <= wall_right&& guy_right + 1 >= wall_right)
+        if(guy_top <= wall_bottom && guy_bottom >= wall_top && guy_left - 1 <= wall_right && guy_right + 1 >= wall_right)
         {
             v[2] = 0;
             break;
